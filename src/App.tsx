@@ -1,26 +1,50 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import { FaMale, FaFemale } from "react-icons/fa";
+import { Next, getFromApi } from "./components";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface RandomUser {
+    gender: string;
+    name: RandomUserName;
+    picture: string;
 }
+
+interface RandomUserName {
+    title: string;
+    first: string;
+    last: string;
+}
+
+const App: React.FC = () => {
+    const [apiRes, setApiRes] = useState<RandomUser | null>(null);
+
+    const fetchData = async () => {
+        let randomUser: RandomUser = await getFromApi();
+        console.log(randomUser);
+        setApiRes(randomUser);
+    };
+
+    useEffect(() => {
+        fetchData();
+    }, []);
+
+    return (
+        <div className="App">
+            <img src={apiRes?.picture} alt="profile_picture" />
+            {apiRes?.gender === "male" ? (
+                <FaMale className="icon" scale="2" />
+            ) : (
+                <FaFemale className="icon" />
+            )}
+            <p>
+                <b>
+                    {apiRes?.name.title} {apiRes?.name.first}{" "}
+                    {apiRes?.name.last}
+                </b>
+            </p>
+            <Next btnText="Next user" getNewUser={fetchData} />
+        </div>
+    );
+};
 
 export default App;
